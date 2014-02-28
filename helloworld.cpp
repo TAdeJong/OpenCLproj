@@ -29,8 +29,9 @@ int main(int argc, char **argv)
 	cl::Platform::get(&platformList);
 
 	checkErr(platformList.size() != 0 ? CL_SUCCESS : -1, "cl::Platform::get");
-	std::clog << "Platform number is: " << platformList.size() << std::endl;std::string platformVendor;
+	std::clog << "Platform number is: " << platformList.size() << std::endl;
 
+	std::string platformVendor;
 	platformList[0].getInfo((cl_platform_info)CL_PLATFORM_VENDOR, &platformVendor);
 	std::clog << "Platform is by: " << platformVendor << "\n";
 

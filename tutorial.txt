@@ -1,1 +1,2 @@
 http://developer.amd.com/tools-and-sdks/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/introductory-tutorial-to-opencl/
+http://opencl.codeplex.com/wikipage?title=OpenCL%20Tutorials%20-%201&referringTitle=OpenCL%20Tutorials

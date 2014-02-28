@@ -1,5 +1,6 @@
 CXX=clang++
-CXXFLAGS=-Wall -Wextra -pedantic
+CXXFLAGS=-Wall -Wextra -Wno-unused-parameter -Wno-comment
+LDLIBS=-lOpenCL
 
 .PHONY: all clean
 

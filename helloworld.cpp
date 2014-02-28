@@ -3,6 +3,16 @@
 
 #include <CL/cl.hpp>
 
+#define TOKENPASTE(x, y) x ## y
+#define TOKENPASTE2(x, y) TOKENPASTE(x, y)
+
+#ifndef TARGET_PLATFORM
+#	define TARGET_PLATFORM GPU
+#endif
+
+#define CONCAT(A, B) A ## B
+#define GET_TARGET_PLATFORM TOKENPASTE2(CL_DEVICE_TYPE_, TARGET_PLATFORM)
+
 void checkErr(cl_int err, const char *name)
 {
 	if (err == CL_SUCCESS)
@@ -25,7 +35,7 @@ int main(int argc, char **argv)
 	std::clog << "Platform is by: " << platformVendor << "\n";
 
 	cl_context_properties cprops[] = {CL_CONTEXT_PLATFORM, (cl_context_properties)(platformList[0])(), 0};
-	cl::Context context(CL_DEVICE_TYPE_GPU, cprops, NULL, NULL, &err);
+	cl::Context context(GET_TARGET_PLATFORM, cprops, NULL, NULL, &err);
 
 	checkErr(err, "Context::Context()");
 

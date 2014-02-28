@@ -4,7 +4,7 @@ LDLIBS=-lOpenCL
 
 .PHONY: all clean
 
-all: helloworld
+all: helloworld vectoradd
 
 clean:
-	$(RM) helloworld
+	$(RM) helloworld vectoradd

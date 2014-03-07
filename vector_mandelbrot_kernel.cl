@@ -1,9 +1,10 @@
-__kernel void vector_mandelbrot(__global const uint xsize, __global const double scale, __global const uint maxiter __global int *C) {
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
+__kernel void vector_mandelbrot(const uint xsize, const double scale, const uint maxiter, __global int *C) {
  
     // Get the index of the current element to be processed
     int i = get_global_id(0);
-	double cre = ((double) i/xsize)/scale;
- 	double cim = ((double) i%xsize)/scale;
+	double cre = (i/xsize)*scale;
+ 	double cim = (i%xsize)*scale;
     double re = cre;
 	double im = cim;
 	double retemp;
@@ -11,10 +12,10 @@ __kernel void vector_mandelbrot(__global const uint xsize, __global const double
 	
 	// Do the operation
 	for(uint j = 0; j < maxiter; j++) {
-			temp = re;
+			retemp = re;
 			re = re*re-im*im + cre;
 			im = 2*retemp*im + cim;
-			result += (int)(re*re+im*im > 4);
+			result += (re*re+im*im < 4);
 	}
 	C[i] = result;
 }

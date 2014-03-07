@@ -9,19 +9,21 @@ using namespace cl;
 
 int main() {
 	// Create the two input vectors
-	const int LIST_SIZE = 1000000;
-	unsigned int xsize = 1000;
-   	const double scale = 0.001;	
-	const unsigned int maxiter = 200;
+	const int LIST_SIZE = 10000000;
+	unsigned int xsize = 10000;
+	const double scale = 0.0001;	
+	const unsigned int maxiter = 300;
+
+	int *A = new int[LIST_SIZE]; 
 
 	try { 
 		// Get available platforms
 		vector<Platform> platforms;
 		Platform::get(&platforms);
 
-	std::string platformVendor;
-	platforms[0].getInfo((cl_platform_info)CL_PLATFORM_VENDOR, &platformVendor);
-	std::clog << "Platform is by: " << platformVendor << "\n";
+		std::string platformVendor;
+		platforms[0].getInfo((cl_platform_info)CL_PLATFORM_VENDOR, &platformVendor);
+		std::clog << "Platform is by: " << platformVendor << "\n";
 
 		// Select the default platform and create a context using this platform and the GPU
 		cl_context_properties cps[3] = { 
@@ -54,18 +56,19 @@ int main() {
 		Kernel kernel(program, "vector_mandelbrot");
 
 		// Create memory buffers
-		Buffer bufferA = Buffer(context, CL_MEM_READ_ONLY, LIST_SIZE * sizeof(int));
-		Buffer bufferB = Buffer(context, CL_MEM_READ_ONLY, LIST_SIZE * sizeof(int));
+		//Buffer bufferA = Buffer(context, CL_MEM_READ_ONLY, LIST_SIZE * sizeof(int));
+		//Buffer bufferB = Buffer(context, CL_MEM_READ_ONLY, LIST_SIZE * sizeof(int));
 		Buffer bufferC = Buffer(context, CL_MEM_WRITE_ONLY, LIST_SIZE * sizeof(int));
 
 		// Copy lists A and B to the memory buffers
-		queue.enqueueWriteBuffer(bufferA, CL_TRUE, 0, LIST_SIZE * sizeof(int), A);
-		queue.enqueueWriteBuffer(bufferB, CL_TRUE, 0, LIST_SIZE * sizeof(int), B);
+		//queue.enqueueWriteBuffer(bufferA, CL_TRUE, 0, LIST_SIZE * sizeof(int), A);
+		//queue.enqueueWriteBuffer(bufferB, CL_TRUE, 0, LIST_SIZE * sizeof(int), B);
 
 		// Set arguments to kernel
-		kernel.setArg(0, bufferA);
-		kernel.setArg(1, bufferB);
-		kernel.setArg(2, bufferC);
+		kernel.setArg(0, xsize);
+		kernel.setArg(1, scale);
+		kernel.setArg(2, maxiter);
+		kernel.setArg(3, bufferC);
 
 		// Run the kernel on specific ND range
 		NDRange global(LIST_SIZE);
@@ -77,9 +80,10 @@ int main() {
 		queue.enqueueReadBuffer(bufferC, CL_TRUE, 0, LIST_SIZE * sizeof(int), C);
 
 		for(int i = 0; i < LIST_SIZE; i ++)
-			std::cout << A[i] << " + " << B[i] << " = " << C[i] << std::endl; 
-	} catch(Error error) {
+			std::cout << C[i] << std::endl; 
+	} catch(Error &error) {
 		std::cout << error.what() << "(" << error.err() << ")" << std::endl;
+		
 	}
 
 	return 0;

@@ -1,5 +1,5 @@
 CXX=clang++
-CXXFLAGS=-Wall -Wextra -Wno-unused-parameter -Wno-comment
+CXXFLAGS=-Wall -Wextra -Wno-unused-parameter -Wno-comment -std=c++0x
 LDLIBS=-lOpenCL
 
 SOURCES=$(wildcard *.cpp)

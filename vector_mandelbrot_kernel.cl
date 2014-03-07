@@ -3,8 +3,8 @@ __kernel void vector_mandelbrot(const uint xsize, const double scale, const uint
  
     // Get the index of the current element to be processed
     int i = get_global_id(0);
-	double cre = (i/xsize)*scale;
- 	double cim = (i%xsize)*scale;
+	double cre = (i/xsize)*scale-1.0;
+ 	double cim = (i%xsize)*scale-1.0;
     double re = cre;
 	double im = cim;
 	double retemp;

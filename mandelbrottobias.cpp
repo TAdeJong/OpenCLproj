@@ -9,10 +9,10 @@ using namespace cl;
 
 int main() {
 	// Create the two input vectors
-	const int LIST_SIZE = 10000000;
-	unsigned int xsize = 10000;
-	const double scale = 0.0001;	
-	const unsigned int maxiter = 300;
+	const int LIST_SIZE = 1000000;
+	unsigned int xsize = 1000;
+	const double scale = 0.002;	
+	const unsigned int maxiter = 200;
 
 	int *A = new int[LIST_SIZE]; 
 

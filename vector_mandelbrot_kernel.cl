@@ -18,3 +18,5 @@ __kernel void vector_mandelbrot(__global const uint xsize, __global const double
 	}
 	C[i] = result;
 }
+
+/* vim: set ft=c : */

@@ -6,3 +6,5 @@ __kernel void vector_add(__global const int *A, __global const int *B, __global 
     // Do the operation
     C[i] = A[i] + B[i];
 }
+
+/* vim: set ft=c : */

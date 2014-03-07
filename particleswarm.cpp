@@ -2,13 +2,18 @@
 #define __CL_ENABLE_EXCEPTIONS
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <climits>
+#include <cmath>
+#include <ctime>
+#include <sstream>
 #include "platform.h"
 
 using namespace cl;
 using std::clog;
 using std::endl;
+using std::stringstream;
 
 struct particle
 {
@@ -18,11 +23,13 @@ struct particle
 	float pbest, px, py;
 };
 
-const int NUM_PARTICLES = 10;
+const int NUM_PARTICLES = 100000;
 const int PARTICLES_SIZE = NUM_PARTICLES*sizeof(particle);
 
 int main(int argc, char **argv)
 {
+	srand(time(NULL));
+
 	cl_int err;
 	vector<Platform> platformList;
 	Platform::get(&platformList);
@@ -40,6 +47,14 @@ int main(int argc, char **argv)
 	CommandQueue queue = CommandQueue(context, devices[0]);
 
 	particle *particles = new particle[NUM_PARTICLES];
+	for (int i = 0; i < NUM_PARTICLES; i++)
+	{
+		particles[i].x = particles[i].px = rand()/((float)RAND_MAX)*2-1;
+		particles[i].y = particles[i].py = rand()/((float)RAND_MAX)*2-1;
+		particles[i].vx = rand()/((float)RAND_MAX)*2-1;
+		particles[i].vy = rand()/((float)RAND_MAX)*2-1;
+		particles[i].pbest = INT_MIN;
+	}
 
 	std::ifstream sourceFile("particleswarm.cl");
 	std::string sourceCode(
@@ -50,7 +65,13 @@ int main(int argc, char **argv)
 
 	try
 	{
-		program.build(devices);
+		stringstream s;
+		s << std::showpoint;
+		s << "-DX_MIN=" << -10.f << "f ";
+		s << "-DY_MIN=" << -10.f << "f ";
+		s << "-DX_MAX=" << 10.f << "f ";
+		s << "-DY_MAX=" << 10.f << "f ";
+		program.build(devices, s.str().c_str());
 	}
 	catch (Error &e)
 	{
@@ -65,26 +86,33 @@ int main(int argc, char **argv)
 	Buffer particleBuffer = Buffer(context, CL_MEM_READ_WRITE, PARTICLES_SIZE);
 	NDRange global(NUM_PARTICLES);
 	NDRange local(1);
+	Event event;
 
-	int gbest = INT_MIN, gx = 0, gy = 0;
-	for (int i = 0; i < 1; i++)
+	float gbest = -42, gx = 0, gy = 0;
+	for (int i = 0; i < 1000; i++)
 	{
-		queue.enqueueWriteBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles);
-		kernel.setArg(0, &particleBuffer);
-		kernel.setArg(1, &gbest);
-		kernel.setArg(2, &gx);
-		kernel.setArg(3, &gy);
+		queue.enqueueWriteBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL, &event);
+		kernel.setArg(0, particleBuffer);
+		kernel.setArg(1, gbest);
+		kernel.setArg(2, gx);
+		kernel.setArg(3, gy);
 
-		queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
+		queue.enqueueNDRangeKernel(kernel, NullRange, global, local, NULL, &event);
+		event.wait();
 
-		queue.enqueueReadBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL, NULL);
+		queue.enqueueReadBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL, &event);
+		event.wait();
 		for (int j = 0; j < NUM_PARTICLES; j++)
 			if (particles[j].pbest > gbest)
 			{
-				gbest = particles[i].pbest;
-				gx = particles[i].px;
-				gy = particles[i].py;
+				gbest = particles[j].pbest;
+				gx = particles[j].px;
+				gy = particles[j].py;
 			}
 	}
+
+	clog << "Best value " << gbest << " found at (" << gx << ", " << gy << ")\n";
+
+	delete[] particles;
 	return 0;
 }

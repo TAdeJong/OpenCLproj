@@ -1,6 +1,6 @@
 CXX=clang++
-CXXFLAGS=-Wall -Wextra -Wno-unused-parameter -Wno-comment -std=c++0x
-LDLIBS=-lOpenCL
+CXXFLAGS=-Wall -Wextra -Wno-unused-parameter -Wno-comment -std=c++0x -g
+LDLIBS=-lOpenCL -lSDL -lGLEW -lGL
 
 SOURCES=$(wildcard *.cpp)
 BINARIES=$(SOURCES:.cpp=)

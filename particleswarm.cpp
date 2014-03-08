@@ -89,6 +89,7 @@ int main(int argc, char **argv)
 	Event event;
 
 	float gbest = -42, gx = 0, gy = 0;
+	float phi1 = 1.5, phi2 = 1.5;
 	for (int i = 0; i < 1000; i++)
 	{
 		queue.enqueueWriteBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL, &event);
@@ -96,6 +97,8 @@ int main(int argc, char **argv)
 		kernel.setArg(1, gbest);
 		kernel.setArg(2, gx);
 		kernel.setArg(3, gy);
+		kernel.setArg(4, phi1);
+		kernel.setArg(5, phi2);
 
 		queue.enqueueNDRangeKernel(kernel, NullRange, global, local, NULL, &event);
 		event.wait();

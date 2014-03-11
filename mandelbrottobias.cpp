@@ -14,8 +14,6 @@ int main() {
 	const double scale = 0.002;	
 	const unsigned int maxiter = 200;
 
-	int *A = new int[LIST_SIZE]; 
-
 	try { 
 		// Get available platforms
 		vector<Platform> platforms;

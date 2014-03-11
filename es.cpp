@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
 	float gbest = std::numeric_limits<float>::infinity(), xbest[DIM];
 	
-	Buffer esBuffer = Buffer(context, NULL, INDIVIDUALS_SIZE);
+	Buffer esBuffer = Buffer(context, 0, INDIVIDUALS_SIZE);
 	Event ev;
 	queue.enqueueMapBuffer(esBuffer, CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, 0, INDIVIDUALS_SIZE);
 	

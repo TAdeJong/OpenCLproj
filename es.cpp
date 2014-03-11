@@ -13,12 +13,14 @@
 #include "platform.h"
 #include "es_common.h"
 
+#define PI 3.1415926535897932384626433832795028841971693993751058209749445923078164062f
+
 using namespace cl;
 using std::clog;
 using std::endl;
 using std::vector;
 
-const int LAMBDA = 500;
+const int LAMBDA = 3000;
 const int MU = LAMBDA / 8;
 const int INDIVIDUALS_SIZE = LAMBDA*sizeof(individual);
 
@@ -79,23 +81,26 @@ int main(int argc, char **argv)
 		for (int j = 0; j < DIM; ++j)
 		{
 			individuals[i].x[j] = (rand()/((float)RAND_MAX)) * (XMAX-XMIN) + XMIN;
+			individuals[i].s[j] = (XMAX-XMIN) / 6.f;
 		}
-		individuals[i].sigma = (XMAX-XMIN) / 6.f;
+		for (int j = 0; j < DIM_A; ++j)
+		{
+			individuals[i].a[j] = (rand()/((float)RAND_MAX)) * (2*PI) - PI;
+		}
+		
 		individuals[i].fitness = 0;
 	}
 
 	float gbest = std::numeric_limits<float>::infinity(), xbest[DIM];
-	float tau0 = 1.f / sqrt((float)DIM);
 	
 	Buffer esBuffer = Buffer(context, NULL, INDIVIDUALS_SIZE);
 	Event ev;
-	kernel.setArg(1, tau0);
 	queue.enqueueMapBuffer(esBuffer, CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, 0, INDIVIDUALS_SIZE);
 	
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		queue.enqueueWriteBuffer(esBuffer, CL_TRUE, 0, INDIVIDUALS_SIZE, individuals);
-		kernel.setArg(2, (cl_ulong)rand());
+		kernel.setArg(1, (cl_ulong)rand());
 		kernel.setArg(0, esBuffer);
 		queue.enqueueNDRangeKernel(kernel, NullRange, NDRange(LAMBDA), NDRange(1), NULL, &ev);
 		ev.wait();

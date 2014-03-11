@@ -18,7 +18,6 @@
 using namespace cl;
 using std::clog;
 using std::endl;
-using std::vector;
 
 const int LAMBDA = 3000;
 const int MU = LAMBDA / 8;
@@ -38,7 +37,7 @@ int main(int argc, char **argv)
 	Context context;
 
 	{
-		vector<Platform> platformList;
+		std::vector<Platform> platformList;
 		Platform::get(&platformList);
 
 		clog << "Platform number is: " << platformList.size() << endl;
@@ -53,7 +52,7 @@ int main(int argc, char **argv)
 		};
 		context = Context(GET_TARGET_PLATFORM, cprops);
 
-		vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+		std::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 		queue = CommandQueue(context, devices[0]);
 
 		std::string sourceCode = "#include \"es.cl\"\n";

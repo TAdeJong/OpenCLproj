@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-using std::vector;
 using namespace cl;
 
 int main() {
@@ -21,7 +20,7 @@ int main() {
 
 	try { 
 		// Get available platforms
-		vector<Platform> platforms;
+		std::vector<Platform> platforms;
 		Platform::get(&platforms);
 
 		// Select the default platform and create a context using this platform and the GPU
@@ -33,7 +32,7 @@ int main() {
 		Context context( CL_DEVICE_TYPE_GPU, cps);
 
 		// Get a list of devices on this platform
-		vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+		std::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
 		// Create a command queue and use the first device
 		CommandQueue queue = CommandQueue(context, devices[0]);

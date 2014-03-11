@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 		try
 		{
-			program.build(devices);
+			program.build(devices, "-I.");
 		}
 		catch (Error &)
 		{

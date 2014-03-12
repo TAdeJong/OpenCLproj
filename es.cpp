@@ -19,13 +19,49 @@ using namespace cl;
 using std::clog;
 using std::endl;
 
-const int LAMBDA = 3000;
+const int LAMBDA = 1000;
 const int MU = LAMBDA / 8;
 const int INDIVIDUALS_SIZE = LAMBDA*sizeof(individual);
 
 bool individual_comp(const individual &a, const individual &b)
 {
 	return a.fitness < b.fitness;
+}
+
+individual get_mean(individual *individuals)
+{
+	individual res;
+	for (int i = 0; i < MU; ++i)
+	{
+		for (int j = 0; j < DIM; ++j)
+		{
+			if (i == 0)
+			{
+				res.x[j] = 0.f;
+				res.s[j] = 0.f;
+			}
+			res.x[j] += individuals[i].x[j];
+			res.s[j] += individuals[i].s[j];
+		}
+		for (int j = 0; j < DIM_A; ++j)
+		{
+			if (i == 0)
+			{
+				res.a[j] = 0.f;
+			}
+			res.a[j] += individuals[i].a[j];
+		}
+	}
+	for (int i = 0; i < DIM; ++i)
+	{
+		res.x[i] /= MU;
+		res.s[i] /= MU;
+	}
+	for (int i = 0; i < DIM_A; ++i)
+	{
+		res.a[i] /= MU;
+	}
+	return res;
 }
 
 int main(int argc, char **argv)
@@ -107,9 +143,10 @@ int main(int argc, char **argv)
 		queue.enqueueReadBuffer(esBuffer, CL_TRUE, 0, INDIVIDUALS_SIZE, individuals);
 		
 		std::sort(individuals, individuals + LAMBDA, individual_comp);
-		for (int j = MU; j < LAMBDA; ++j)
+		individual mean = get_mean(individuals);
+		for (int j = 0; j < LAMBDA; ++j)
 		{
-			individuals[j] = individuals[rand() % MU];
+			individuals[j] = mean;
 		}
 	}
 	gbest = individuals[0].fitness;

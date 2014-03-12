@@ -94,7 +94,6 @@ int main(int argc, char **argv)
 		std::string sourceCode = "#include \"es.cl\"\n";
 		Program::Sources source(1, std::make_pair(sourceCode.c_str(), sourceCode.length()+1));
 		Program program = Program(context, source);
-		setenv("CUDA_CACHE_DISABLE", "1", 1);
 
 		try
 		{

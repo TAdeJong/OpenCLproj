@@ -21,18 +21,13 @@
 // OpenCL
 #include "platform.h"
 
+// Particleswarm internal
+#include "particleswarm_common.h"
+
 using namespace cl;
 using std::clog;
 using std::endl;
 using std::stringstream;
-
-struct particle
-{
-	float x, y;
-	float vx, vy;
-
-	float pbest, px, py;
-};
 
 const int NUM_PARTICLES = 10000;
 const int PARTICLES_SIZE = NUM_PARTICLES*sizeof(particle);
@@ -82,7 +77,7 @@ void compileShaders(GLuint &shaderProgram, const char *vertex, const char *fragm
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-	std::string common = readFile("particleswarm_common.glsl");
+	std::string common = readFile("particleswarm_common.h");
 	std::string fragmentSource = readFile(fragment);
 	std::string vertexSource = readFile(vertex);
 
@@ -206,6 +201,11 @@ int main(int argc, char **argv)
 		particles[i].vx = rand()/((float)RAND_MAX)*2-1;
 		particles[i].vy = rand()/((float)RAND_MAX)*2-1;
 		particles[i].pbest = INT_MIN;
+
+		particles[i].state.w = rand();
+		particles[i].state.x = rand();
+		particles[i].state.y = rand();
+		particles[i].state.z = rand();
 	}
 
 	BufferGL particleBuffer;
@@ -235,13 +235,13 @@ int main(int argc, char **argv)
 		queue.enqueueReadBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL);
 		for (int j = 0; j < NUM_PARTICLES; j++)
 		{
-			if (particles[j].pbest > gbest)
+			if (particles[j].pbest > gbest && std::isfinite(particles[j].pbest))
 			{
 				gbest = particles[j].pbest;
 				gx = particles[j].px;
 				gy = particles[j].py;
 			}
-			clog << "[" << i << ", " << j << "] (" << particles[j].x << ", " << particles[j].y << ")\n";
+			//clog << "[" << i << ", " << j << "] (" << particles[j].x << ", " << particles[j].y << ")\n";
 		}
 
 		clog << "[" << i << "] Best value " << gbest << " found at (" << gx << ", " << gy << ")\n";

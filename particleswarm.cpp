@@ -62,6 +62,8 @@ void drawFrame()
 	glDrawArrays(GL_POINTS, 0, NUM_PARTICLES);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	SDL_GL_SwapBuffers();
 	glFlush();
 	SDL_Delay(30);
@@ -178,10 +180,10 @@ int main(int argc, char **argv)
 		{
 			stringstream s;
 			s << std::showpoint;
-			s << "-DX_MIN=" << -10.f << "f ";
-			s << "-DY_MIN=" << -10.f << "f ";
-			s << "-DX_MAX=" << 10.f << "f ";
-			s << "-DY_MAX=" << 10.f << "f ";
+			s << "-DX_MIN=" << -1.f << "f ";
+			s << "-DY_MIN=" << -1.f << "f ";
+			s << "-DX_MAX=" << 1.f << "f ";
+			s << "-DY_MAX=" << 1.f << "f ";
 			program.build(devices, s.str().c_str());
 		}
 		catch (Error &e)
@@ -224,7 +226,7 @@ int main(int argc, char **argv)
 	vector<Memory> glObjects(1, particleBuffer);
 
 	float gbest = -42, gx = 0, gy = 0;
-	float phi1 = 1.5, phi2 = 1.5;
+	float phi1 = 0.15, phi2 = 0.25;
 	for (int i = 0; i < 100; i++) /* FIXME */
 	{
 		queue.enqueueAcquireGLObjects(&glObjects);
@@ -232,13 +234,17 @@ int main(int argc, char **argv)
 		kernelF(particleBuffer, gbest, gx, gy, phi1, phi2);
 		queue.enqueueReadBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL);
 		for (int j = 0; j < NUM_PARTICLES; j++)
+		{
 			if (particles[j].pbest > gbest)
 			{
 				gbest = particles[j].pbest;
 				gx = particles[j].px;
 				gy = particles[j].py;
 			}
+			clog << "[" << i << ", " << j << "] (" << particles[j].x << ", " << particles[j].y << ")\n";
+		}
 
+		clog << "[" << i << "] Best value " << gbest << " found at (" << gx << ", " << gy << ")\n";
 		queue.enqueueReleaseGLObjects(&glObjects);
 		queue.flush();
 		drawFrame();

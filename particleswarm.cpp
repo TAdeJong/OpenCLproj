@@ -25,11 +25,13 @@
 #include "particleswarm_common.h"
 
 using namespace cl;
+using std::cout;
 using std::clog;
 using std::endl;
 using std::stringstream;
 
 const int NUM_PARTICLES = 10000;
+const int NUM_ITERATIONS = 10000;
 const int PARTICLES_SIZE = NUM_PARTICLES*sizeof(particle);
 
 GLuint bgShaderProgram;
@@ -125,6 +127,8 @@ void compileShaders(GLuint &shaderProgram, const char *vertex, const char *fragm
 
 int main(int argc, char **argv)
 {
+	std::ofstream logfile("particleswarm.log");
+	clog.rdbuf(logfile.rdbuf());
 	srand(time(NULL));
 
 	SDL_Init(SDL_INIT_VIDEO);
@@ -226,29 +230,28 @@ int main(int argc, char **argv)
 	vector<Memory> glObjects(1, particleBuffer);
 
 	float gbest = -42, gx = 0, gy = 0;
-	float phi1 = 0.15, phi2 = 0.25;
-	for (int i = 0; i < 100; i++) /* FIXME */
+	float phi1 = 1.5f, phi2 = 1.5f;
+	for (int i = 0; i < NUM_ITERATIONS; i++) /* FIXME */
 	{
+		cout << "\r    \r" << (i*100)/NUM_ITERATIONS << "%" << std::flush;
 		queue.enqueueAcquireGLObjects(&glObjects);
 		queue.enqueueWriteBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL);
 		kernelF(particleBuffer, gbest, gx, gy, phi1, phi2);
 		queue.enqueueReadBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL);
 		for (int j = 0; j < NUM_PARTICLES; j++)
-		{
 			if (particles[j].pbest > gbest && std::isfinite(particles[j].pbest))
 			{
 				gbest = particles[j].pbest;
 				gx = particles[j].px;
 				gy = particles[j].py;
 			}
-			//clog << "[" << i << ", " << j << "] (" << particles[j].x << ", " << particles[j].y << ")\n";
-		}
 
 		clog << "[" << i << "] Best value " << gbest << " found at (" << gx << ", " << gy << ")\n";
 		queue.enqueueReleaseGLObjects(&glObjects);
 		queue.flush();
 		drawFrame();
 	}
+	cout << "\n";
 
 	clog << "Best value " << gbest << " found at (" << gx << ", " << gy << ")\n";
 

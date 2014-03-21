@@ -1,4 +1,3 @@
-#include "xorshift.h"
 #include "particleswarm_common.h"
 
 __kernel void particleswarm(__global struct particle *particles, const float gbest, const float gx, const float gy, const float phi1, const float phi2)

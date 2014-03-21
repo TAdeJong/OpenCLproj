@@ -1,13 +1,13 @@
 #ifdef __OPENCL_VERSION__
-#	define uint32_t uint;
+#	define uint32_t uint
 #endif
 
 struct rngState
 {
-    uint32_t x = 123456789;
-    uint32_t y = 362436069;
-    uint32_t z = 521288629;
-    uint32_t w = 88675123;
+    uint32_t x;
+    uint32_t y;
+    uint32_t z;
+    uint32_t w;
 };
 
 #ifdef __OPENCL_VERSION__
@@ -19,8 +19,8 @@ float xorshift(__global struct rngState *state)
     state->x = state->y;
 	state->y = state->z;
 	state->z = state->w;
-	state->w ^= (state->w >> 19) ^ t ^ (state->t >> 8);
-	return state->w / float(UINT_MAX);
+	state->w ^= (state->w >> 19) ^ t ^ (t >> 8);
+	return state->w / ((float) UINT_MAX);
 }
 
 #undef uint32_t

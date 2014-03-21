@@ -13,15 +13,18 @@ __kernel void particleswarm(__global struct particle *particles, const float gbe
 		p->py = p->y;
 	}
 
-	float rndval = xorshift(&p->state)*phi1;
+	p->vx *= 0.9f;
+	p->vy *= 0.9f;
+
+	float rndval = xorshift(&p->state)*phi1*(X_MAX-X_MIN)/100.f;
 	p->vx += rndval*(p->px - p->x);
-	rndval = xorshift(&p->state)*phi2;
+	rndval = xorshift(&p->state)*phi2*(X_MAX-X_MIN)/100.f;
 	p->vx += rndval*(gx - p->x);
 	p->x = clamp(p->x + p->vx, X_MIN, X_MAX);
 
-	rndval = xorshift(&p->state)*phi1;
+	rndval = xorshift(&p->state)*phi1*(Y_MAX-Y_MIN)/100.f;
 	p->vy += rndval*(p->py - p->y);
-	rndval = xorshift(&p->state)*phi2;
+	rndval = xorshift(&p->state)*phi2*(Y_MAX-Y_MIN)/100.f;
 	p->vy += rndval*(gy - p->y);
 	p->y = clamp(p->y + p->vy, Y_MIN, Y_MAX);
 }

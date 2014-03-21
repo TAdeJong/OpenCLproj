@@ -62,8 +62,9 @@ void drawFrame()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	SDL_GL_SwapBuffers();
-	glFlush();
-	SDL_Delay(30);
+	//glFlush();
+	//SDL_Delay(3);
+	glFinish();
 }
 
 std::string readFile(const char *filename)
@@ -141,7 +142,7 @@ int main(int argc, char **argv)
 	glOrtho(0, 800, 600, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glDisable(GL_DEPTH_TEST);
-	glClearColor(1.f, 0.f, 0.f, 1.f);
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 
 	compileShaders(bgShaderProgram, "particleswarm_bg.vs", "particleswarm_bg.fs");
 	compileShaders(particleShaderProgram, "particleswarm.vs", "particleswarm.fs");
@@ -200,10 +201,10 @@ int main(int argc, char **argv)
 	particles = new particle[NUM_PARTICLES];
 	for (int i = 0; i < NUM_PARTICLES; i++)
 	{
-		particles[i].x = particles[i].px = rand()/((float)RAND_MAX)*2-1;
-		particles[i].y = particles[i].py = rand()/((float)RAND_MAX)*2-1;
-		particles[i].vx = rand()/((float)RAND_MAX)*2-1;
-		particles[i].vy = rand()/((float)RAND_MAX)*2-1;
+		particles[i].x = particles[i].px = rand()/((float)RAND_MAX)*2.f-1.f;
+		particles[i].y = particles[i].py = rand()/((float)RAND_MAX)*2.f-1.f;
+		particles[i].vx = 0;
+		particles[i].vy = 0;
 		particles[i].pbest = INT_MIN;
 
 		particles[i].state.w = rand();
@@ -230,8 +231,8 @@ int main(int argc, char **argv)
 	vector<Memory> glObjects(1, particleBuffer);
 
 	float gbest = -42, gx = 0, gy = 0;
-	float phi1 = 1.5f, phi2 = 1.5f;
-	for (int i = 0; i < NUM_ITERATIONS; i++) /* FIXME */
+	float phi1 = 15.f, phi2 = .8f;
+	for (int i = 0; i < NUM_ITERATIONS; i++)
 	{
 		cout << "\r    \r" << (i*100)/NUM_ITERATIONS << "%" << std::flush;
 		queue.enqueueAcquireGLObjects(&glObjects);
@@ -254,6 +255,7 @@ int main(int argc, char **argv)
 	cout << "\n";
 
 	clog << "Best value " << gbest << " found at (" << gx << ", " << gy << ")\n";
+	clog.rdbuf(nullptr);
 
 	delete[] particles;
 

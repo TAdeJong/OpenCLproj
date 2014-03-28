@@ -12,7 +12,7 @@ int main() {
 	const int LIST_SIZE = 1000000;
 	unsigned int xsize = 1000;
 	const double scale = 0.002;	
-	const unsigned int maxiter = 200;
+	const unsigned int maxiter = 255;
 
 	try { 
 		// Get available platforms
@@ -77,6 +77,7 @@ int main() {
 		int *C = new int[LIST_SIZE];
 		queue.enqueueReadBuffer(bufferC, CL_TRUE, 0, LIST_SIZE * sizeof(int), C);
 
+		std::cout << "P2 " << xsize << " " << LIST_SIZE/xsize << " " << maxiter << std::endl;
 		for(int i = 0; i < LIST_SIZE; i ++)
 			std::cout << C[i] << std::endl; 
 	} catch(Error &error) {

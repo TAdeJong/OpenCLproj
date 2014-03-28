@@ -234,6 +234,13 @@ int main(int argc, char **argv)
 	float phi1 = 15.f, phi2 = .8f;
 	for (int i = 0; i < NUM_ITERATIONS; i++)
 	{
+		SDL_Event ev;
+		while (SDL_PollEvent(&ev))
+			if (ev.type == SDL_QUIT)
+				break;
+		if (ev.type == SDL_QUIT)
+			break;
+
 		cout << "\r    \r" << (i*100)/NUM_ITERATIONS << "%" << std::flush;
 		queue.enqueueAcquireGLObjects(&glObjects);
 		queue.enqueueWriteBuffer(particleBuffer, CL_TRUE, 0, PARTICLES_SIZE, particles, NULL);
